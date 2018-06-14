@@ -2,6 +2,7 @@
 #include "ui_hexviewwindow.h"
 #include <QDir>
 #include <QStringBuilder>
+#include <QTextBlock>
 #include <array>
 #include <iomanip>
 #include <iostream>
@@ -24,6 +25,7 @@ std::string HexViewWindow::hexify(array<unsigned char, CHUNK_SIZE> &buffer) {
   string retVal;
   stringstream out;
   stringstream raw;
+
   retVal.reserve(CHUNK_SIZE * 2);
   out << std::setfill('0') << std::setw(2) << std::hex;
   for (auto item : buffer) {
@@ -77,6 +79,7 @@ void HexViewWindow::getFileC(std::ifstream &infile) {
 }
 std::string HexViewWindow::getFile(std::ifstream &infile) {
   string filedata;
+
   if (infile) {
     infile.seekg(0, infile.end);
     long length = infile.tellg();
@@ -117,4 +120,13 @@ void HexViewWindow::on_actionOpen_triggered() {
   string filedata = getFile(infile);
 
   ui->plainTextEdit->setPlainText(filedata.c_str());
+
+  QFontMetrics metrics(ui->plainTextEdit->font());
+  QTextBlock textBlock =
+      ui->plainTextEdit->document()->findBlockByLineNumber(1);
+  auto tmp = textBlock.text();
+  auto width = metrics.width(textBlock.text());
+
+  cout << width << endl;
+  this->resize(static_cast<int>(width * 1.1), this->geometry().height());
 }
