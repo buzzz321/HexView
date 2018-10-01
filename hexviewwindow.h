@@ -17,7 +17,7 @@ class HexViewWindow : public QMainWindow {
 public:
   explicit HexViewWindow(QWidget *parent = nullptr);
   ~HexViewWindow();
-  static const long CHUNK_SIZE = 30;
+  static const unsigned long CHUNK_SIZE = 30;
 private slots:
   void on_actionOpen_triggered();
 

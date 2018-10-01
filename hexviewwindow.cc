@@ -42,7 +42,7 @@ std::string HexViewWindow::hexify(array<unsigned char, CHUNK_SIZE> &buffer) {
 
 void HexViewWindow::hexifyC(array<unsigned char, CHUNK_SIZE> &buffer,
                             char *line) {
-  for (auto index = 0; index < CHUNK_SIZE; index++) {
+  for (unsigned long index = 0; index < CHUNK_SIZE; index++) {
     snprintf(&line[index * 3], // 3 is size of format string....
              CHUNK_SIZE, "%02x ", buffer[index] & 0xff);
   }
@@ -51,7 +51,7 @@ void HexViewWindow::hexifyC(array<unsigned char, CHUNK_SIZE> &buffer,
 void HexViewWindow::getFileC(std::ifstream &infile) {
   if (infile) {
     infile.seekg(0, infile.end);
-    long length = infile.tellg();
+    unsigned long length = static_cast<unsigned long>(infile.tellg());
     infile.seekg(0, infile.beg);
     const auto BUFFERSIZE =
         static_cast<unsigned long>(length) * sizeof(char) * 4UL;
@@ -60,14 +60,14 @@ void HexViewWindow::getFileC(std::ifstream &infile) {
 
     char buffer[CHUNK_SIZE];
 
-    for (auto lineno = 0; lineno <= length / CHUNK_SIZE; lineno++) {
+    for (unsigned long lineno = 0; lineno <= length / CHUNK_SIZE; lineno++) {
       infile.read(buffer, CHUNK_SIZE);
       if (lineno % 1000 == 0) {
         cout << " chunk no: " << lineno << endl;
       }
 
       if (infile) {
-        for (auto index = 0; index < CHUNK_SIZE; index++) {
+        for (unsigned long index = 0; index < CHUNK_SIZE; index++) {
           snprintf(&filebuffer[lineno * CHUNK_SIZE +
                                index * 3], // 3 is size of format string....
                    CHUNK_SIZE, "%02x ", buffer[index] & 0xff);
@@ -82,14 +82,14 @@ std::string HexViewWindow::getFile(std::ifstream &infile) {
 
   if (infile) {
     infile.seekg(0, infile.end);
-    long length = infile.tellg();
+    unsigned long length = static_cast<unsigned long>(infile.tellg());
     infile.seekg(0, infile.beg);
     array<unsigned char, CHUNK_SIZE> buffer;
 
     filedata.reserve(static_cast<unsigned long>(length) * sizeof(char) * 3UL);
 
-    for (auto n = 0; n <= length / CHUNK_SIZE; n++) {
-      infile.read((char *)buffer.data(), buffer.size());
+    for (unsigned long n = 0; n <= length / CHUNK_SIZE; n++) {
+      infile.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
       if (n % 50000 == 0) {
         cout << " chunk no: " << n << endl;
       }
@@ -99,7 +99,7 @@ std::string HexViewWindow::getFile(std::ifstream &infile) {
       }
     }
     if (!infile.eof()) {
-      infile.read((char *)buffer.data(), buffer.size());
+      infile.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
       filedata += hexify(buffer);
       cout << "Read last " << infile.gcount() << endl;
     }
